@@ -48,7 +48,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Fotografier den Müll'),),
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.blue),
+        title: Text('Fotografiere den Müll'),),
       // Wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner
       // until the controller has finished initializing.
