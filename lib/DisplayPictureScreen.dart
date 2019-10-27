@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:path/path.dart' as prefix0;
-
+import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -217,7 +218,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                     )
                     );
                   }
-     HttpClient httpClient = new HttpClient();
+   
      bool disableRequest=false;
 
 
@@ -225,8 +226,8 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
 
 
 
-Future<String> apiRequest() async {
-  if(disableRequest)return '';
+Future<http.Response> apiRequest() async {
+  if(disableRequest)return null;
   disableRequest = true;
   String url;
   Map jsonMap;
@@ -237,7 +238,7 @@ Future<String> apiRequest() async {
     Uint8List imageBytes = imageFile.readAsBytesSync();
     String base64Image = String.fromCharCodes(imageBytes);
 
-             url = 'http://192.168.2.95:8081/api/v1/hotspots';
+             url = 'http://192.168.137.6:8081/api/v1/hotspots';
              jsonMap = {
                 'gpsData': {
                   'longitude': position.longitude.toString(),
@@ -260,18 +261,22 @@ Future<String> apiRequest() async {
           return fehlerMeldung('Es wurde keine Kategorie ausgewählt');
             }
            
-  HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
-  request.headers.set('content-type', 'application/json');
-  request.add(utf8.encode(json.encode(jsonMap)));
-  HttpClientResponse response = await request.close();
+
  
-  String reply = '';//await response.transform(utf8.decoder).join()
+  http.post(url,
+      headers: {"Content-Type": "application/json"},
+      body: utf8.encode(json.encode(jsonMap))
+  ).then((http.Response response) {
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.contentLength}");
+    print(response.headers);
+    print(response.request);
   
-        httpClient.close();
+    Navigator.popUntil(context, ModalRoute.withName('/'));
+  });
   disableRequest = false;
   await _save();
-  Navigator.popUntil(context, ModalRoute.withName('/'));
-  return reply;
+  return null;
 }
 
 _save() async {
@@ -285,24 +290,25 @@ _save() async {
         prefs.setInt(key1, level);
       }
 
-      Future<String> fehlerMeldung(String fehler) async {
+      Future<Response> fehlerMeldung(String fehler) async {
 
-return  showDialog<String>(
+return  showDialog<Response>(
     context: context,
     barrierDismissible: false, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('Fehler'),
+        backgroundColor: Colors.indigo[300],
+        title: Text('Fehler',style: new TextStyle(color: Colors.white)),
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              Text(fehler),
+              Text(fehler,style: new TextStyle(color: Colors.white)),
             ],
           ),
         ),
         actions: <Widget>[
           FlatButton(
-            child: Text('OK'),
+            child: Text('OK',style: new TextStyle(color: Colors.white),),
             onPressed: () {
               Navigator.of(context).pop();
             },
