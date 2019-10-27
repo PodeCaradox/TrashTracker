@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +10,7 @@ class Profile extends StatefulWidget {
   }
 
 Map<int, int> levelMap = {
-  1: 10,
+  1: 5,
   2: 20,
   3: 40,
   4: 70,
@@ -23,6 +25,7 @@ Map<int, int> levelMap = {
 class _ProfileState extends State<Profile> {
 int level = 1;
 int experience = 0;
+int maxexperience=5;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ int experience = 0;
          elevation: 0.0,
         backgroundColor: Colors.indigo[300],
         iconTheme: IconThemeData(color: Colors.white),
-        title: Text('Kategorisierung')),
+        title: Text('Profil')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body:Container(
@@ -73,16 +76,16 @@ builder: (BuildContext context, AsyncSnapshot snapshot) {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          new Text('Dein aktuells Level:',style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.white) ),
+          new Text('Dein aktuelles Level:',style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.white) ),
                 new CircularPercentIndicator(
                 radius: 180.0,
                 animation: true,
                 animationDuration: 1200,
                 lineWidth: 15.0,
-                percent: 1,
+                percent: 1/maxexperience*experience,
                 startAngle: 0,
                 center: new Text(
-                  "Level "+level.toString(),
+                  "Level "+(level + 1).toString(),
                   style:
                       new TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0, color: Colors.white),
                 ),
@@ -108,6 +111,14 @@ _read() async {
         experience = prefs.getInt(key) ?? 0;
         final key1 = 'level';
         level = prefs.getInt(key1) ?? 0;
+        var _list = levelMap.values.toList();
+        if(experience>=_list[level]){
+          level++;
+          experience=0;
+          maxexperience = _list[level];
+          prefs.setInt(key, experience);
+          prefs.setInt(key1, level);
+        }
       }
 
 }

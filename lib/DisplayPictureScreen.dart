@@ -61,7 +61,12 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
         foregroundColor: Colors.white,
         backgroundColor: Colors.indigo[300],
                 onPressed: (){
-            apiRequest();
+                   if(!disableRequest){
+                    disableRequest = true;
+                    apiRequest();
+
+                   }
+                   
         },
         label: Text('Senden'),
         icon: Icon(Icons.send),
@@ -117,9 +122,6 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                             ),
                            SliderTheme(
                                 child:Slider(
-                                
-                     
-
                                 min: 0,
                                 max: 4,
                                 divisions: 4,
@@ -227,16 +229,23 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
 
 
 Future<http.Response> apiRequest() async {
-  if(disableRequest)return null;
-  disableRequest = true;
+ 
   String url;
   Map jsonMap;
-  if(actualID!=-1){
-   
+  if(actualID == -1){
+ 
+disableRequest = false;
+ return fehlerMeldung('Es wurde keine Kategorie ausgewählt','Fehler',true);
+            }else if(textController.text == ''){
+            disableRequest = false;
+          return fehlerMeldung('Es wurde keine Beschreibung hinzugefügt','Fehler',true);
+            }
+             fehlerMeldung('Informationen werden gesendet','Information',false);
+  //beschreibung
     Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     File imageFile =File(widget.imagePath);
     Uint8List imageBytes = imageFile.readAsBytesSync();
-    String base64Image = String.fromCharCodes(imageBytes);
+    String base64Image = base64.encode(imageBytes);
 
              url = 'http://192.168.137.6:8081/api/v1/hotspots';
              jsonMap = {
@@ -255,27 +264,27 @@ Future<http.Response> apiRequest() async {
                 }
               };
               
-
-            }else{
-              disableRequest = false;
-          return fehlerMeldung('Es wurde keine Kategorie ausgewählt');
-            }
-           
-
+ try{
  
   http.post(url,
       headers: {"Content-Type": "application/json"},
-      body: utf8.encode(json.encode(jsonMap))
+      body: json.encode(jsonMap)
   ).then((http.Response response) {
+    /*
     print("Response status: ${response.statusCode}");
     print("Response body: ${response.contentLength}");
     print(response.headers);
     print(response.request);
-  
+  */
+   
     Navigator.popUntil(context, ModalRoute.withName('/'));
+     fehlerMeldung('Meldung gesendet','Info',true);
   });
-  disableRequest = false;
+ }catch(e){
+return fehlerMeldung('Server konnte nicht erreicht werden','Fehler',true);
+ }
   await _save();
+ 
   return null;
 }
 
@@ -285,12 +294,13 @@ _save() async {
         int experience = prefs.getInt(key) ?? 0;
         final key1 = 'level';
         final level = prefs.getInt(key1) ?? 0;
+     
         experience++;
         prefs.setInt(key, experience);
         prefs.setInt(key1, level);
       }
 
-      Future<Response> fehlerMeldung(String fehler) async {
+      Future<Response> fehlerMeldung(String fehler,String title,bool activateButton) async {
 
 return  showDialog<Response>(
     context: context,
@@ -298,7 +308,7 @@ return  showDialog<Response>(
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: Colors.indigo[300],
-        title: Text('Fehler',style: new TextStyle(color: Colors.white)),
+        title: Text(title,style: new TextStyle(color: Colors.white)),
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
@@ -308,8 +318,9 @@ return  showDialog<Response>(
         ),
         actions: <Widget>[
           FlatButton(
-            child: Text('OK',style: new TextStyle(color: Colors.white),),
+            child: Text((activateButton)?'OK':'',style: new TextStyle(color: Colors.white),),
             onPressed: () {
+              if(activateButton)
               Navigator.of(context).pop();
             },
           ),
