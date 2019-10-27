@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'DisplayPictureScreen.dart';
+import 'Profile.dart';
 
 class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -49,8 +50,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.blue),
-        title: Text('Fotografiere den Müll'),),
+         elevation: 0.0,
+        backgroundColor: Colors.indigo[300],
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.person),
+          color: Colors.white,
+              onPressed: () {
+                Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Profile(),
+              ),
+            );
+              },)
+        ],
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text('Fotografiere den Müll',style: TextStyle(color: Colors.white)),),
       // Wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner
       // until the controller has finished initializing.
@@ -68,7 +83,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.camera_alt),
-        backgroundColor: Colors.grey[300],
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.indigo[300],
         // Provide an onPressed callback.
         onPressed: () async {
           // Take the Picture in a try / catch block. If anything goes wrong,

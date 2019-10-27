@@ -19,9 +19,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  percent_indicator: "^2.1.1"
   flutter_statusbarcolor:
+  shared_preferences:
   geolocator: ^5.1.4+2
   camera: ^0.5.6+2
+  
   path_provider:
   path:
 

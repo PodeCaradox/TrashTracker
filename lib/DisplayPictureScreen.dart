@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as prefix0;
 
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Profile.dart';
 
 class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
@@ -33,11 +37,28 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.blue),
-        title: Text('Kategorisierung')),
+         elevation: 0.0,
+        backgroundColor: Colors.indigo[300],
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.person),
+          color: Colors.white,
+              onPressed: () {
+                Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Profile(),
+              ),
+            );
+              },)
+        ],
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text('Kategorisierung' ,style: TextStyle(color: Colors.white),)
+        
+        ),
+        
       floatingActionButton: FloatingActionButton.extended(
-        foregroundColor: Colors.blue,
-        backgroundColor: Colors.black54,
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.indigo[300],
                 onPressed: (){
             apiRequest();
         },
@@ -47,7 +68,26 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
       ),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Padding(
+      body: Container(
+      // Add box decoration
+      decoration: BoxDecoration(
+        // Box decoration takes a gradient
+        gradient: LinearGradient(
+          // Where the linear gradient begins and ends
+          begin: Alignment.topCenter,
+          end: Alignment.bottomLeft,
+          // Add one stop for each color. Stops should increase from 0 to 1
+          stops: [0.1, 0.5, 0.7, 0.9],
+          colors: [
+            // Colors are easy thanks to Flutter's Colors class.
+            Colors.indigo[300],
+            Colors.indigo[600],
+            Colors.indigo[700],
+            Colors.indigo[900],
+          ],
+        ),
+      ),
+      child:Padding(
         padding: EdgeInsets.all(10),
         child: 
         new Column(
@@ -71,64 +111,87 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
            
             ].map((ButtonStruct buttonStruct) {
             return new GridTile(
-                child: new RoundButton(text: buttonStruct.text, icon: buttonStruct.icon, iconColor: (buttonStruct.id != actualID)? Colors.black:Colors.blue,onPressed: () => setState(() => actualID = buttonStruct.id)));
+                child: new RoundButton(text: buttonStruct.text, icon: buttonStruct.icon, iconColor: (buttonStruct.id != actualID)? Colors.white:Colors.greenAccent,onPressed: () => setState(() => actualID = buttonStruct.id)));
                           }).toList()),
                             ),
-                            Slider(
-                              activeColor: Colors.blue,
-                              inactiveColor: Colors.black,
-                              min: 0,
-                              max: 4,
-                              divisions: 4,
-                              value: _sliderValue,
-                              onChanged: (double changed) => setState(() { 
-                             String newText = sliderText;
-                                switch (changed.toInt()){
-                                case 0:
-                                newText = 'Sehr Leichte Verschmutung';
-                                break;
-                                case 1:
-                                newText = 'Leichte Verschmutung';
-                                break;
-                                case 2:
-                                newText = 'Mittlere Verschmutung';
-                                break;
-                                case 3:
-                                newText = 'Starke Verschmutung';
-                                break;
-                                case 4:
-                                newText = 'Sehr Stark Verschmutung';
-                                break;
-                               
-                                }
-                                sliderText = newText;
-                                _sliderValue = changed;
-                                 setState(() { 
-                                   sliderText = newText;
-                                   _sliderValue = changed;
-                                 
-                                 });
-                            
+                           SliderTheme(
+                                child:Slider(
                                 
-                                }),
-                              label: sliderText,
+                     
+
+                                min: 0,
+                                max: 4,
+                                divisions: 4,
+                                value: _sliderValue,
+                                onChanged: (double changed) => setState(() { 
+                              String newText = sliderText;
+                                  switch (changed.toInt()){
+                                  case 0:
+                                  newText = 'Sehr Leichte Verschmutung';
+                                  break;
+                                  case 1:
+                                  newText = 'Leichte Verschmutung';
+                                  break;
+                                  case 2:
+                                  newText = 'Mittlere Verschmutung';
+                                  break;
+                                  case 3:
+                                  newText = 'Starke Verschmutung';
+                                  break;
+                                  case 4:
+                                  newText = 'Sehr Stark Verschmutung';
+                                  break;
+                                
+                                  }
+                                  sliderText = newText;
+                                  _sliderValue = changed;
+                                  setState(() { 
+                                    sliderText = newText;
+                                    _sliderValue = changed;
+                                  
+                                  });
+                              
+                                  
+                                  }),
+                                label: sliderText,
+                              ),data: SliderTheme.of(context).copyWith(
+                                activeTickMarkColor: Colors.white,
+                                disabledInactiveTrackColor: Colors.white,
+                                activeTrackColor: Colors.greenAccent,
+                                disabledActiveTrackColor: Colors.white,
+                                disabledThumbColor: Colors.white,
+                                disabledInactiveTickMarkColor: Colors.white,
+                                inactiveTickMarkColor: Colors.black,
+                                inactiveTrackColor: Colors.white,
+                                valueIndicatorColor: Colors.indigo[300],
+
+                                overlappingShapeStrokeColor: Colors.greenAccent,
+                                thumbColor: Colors.greenAccent,
+                                disabledActiveTickMarkColor: Colors.white,
+                              valueIndicatorTextStyle: TextStyle(color: Colors.white),
+                              ),
                             ),
                             RaisedButton(
+                              color: Colors.indigo[300],
                               child: Text(
                                 'Beschreibung',
-                                style: TextStyle(fontSize: 15)
+                                style: TextStyle(fontSize: 15,color: Colors.white)
                               ),
                               onPressed: () {
                                 return showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text('Beschreibung'),
+                                      backgroundColor: Colors.indigo[300],
+                                      title: Text('Beschreibung' ,style: new TextStyle(color: Colors.white),),
                                       content:  TextField(
+                                        style: new TextStyle(color: Colors.white),
                                           controller: textController,
                                             decoration: InputDecoration(
                                                 border: InputBorder.none,
-                                                hintText: 'Gebe eine Beschreibung ein'
+                                                hintText: 'Gebe eine Beschreibung ein',
+                                                hintStyle: new TextStyle(color: Colors.white),
+                                                fillColor: Colors.white
                                               ),
                                       ),
                                       actions: <Widget>[
@@ -151,30 +214,40 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                           ],
                         )
                       )
+                    )
                     );
                   }
      HttpClient httpClient = new HttpClient();
+     bool disableRequest=false;
+
+
+
+
+
+
 Future<String> apiRequest() async {
-  
+  if(disableRequest)return '';
+  disableRequest = true;
   String url;
   Map jsonMap;
   if(actualID!=-1){
+   
     Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     File imageFile =File(widget.imagePath);
-    List<int> imageBytes = imageFile.readAsBytesSync();
-    String base64Image = base64.encode(imageBytes);
+    Uint8List imageBytes = imageFile.readAsBytesSync();
+    String base64Image = String.fromCharCodes(imageBytes);
 
-             url = 'http://192.168.137.6:8081/api/v1/hotspots';
+             url = 'http://192.168.2.95:8081/api/v1/hotspots';
              jsonMap = {
                 'gpsData': {
                   'longitude': position.longitude.toString(),
                   'latitude': position.latitude.toString()
                 },
-                'category': Kategorie.values[actualID].toString(),
+                'category': Kategorie.values[actualID].toString().replaceAll('Kategorie.', ''),
                 'severity': _sliderValue,
                 'description': ''+textController.text,
                 'image': {
-                  'fileName': DateTime.now(),
+                  'fileName': DateTime.now().toString(),
                   'fileType': prefix0.extension(widget.imagePath),
                   'data': base64Image//zurück zum main bildschirm 
                   //tippe die mülltonne zum weiterkommen
@@ -183,7 +256,38 @@ Future<String> apiRequest() async {
               
 
             }else{
-          return showDialog<String>(
+              disableRequest = false;
+          return fehlerMeldung('Es wurde keine Kategorie ausgewählt');
+            }
+           
+  HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
+  request.headers.set('content-type', 'application/json');
+  request.add(utf8.encode(json.encode(jsonMap)));
+  HttpClientResponse response = await request.close();
+ 
+  String reply = '';//await response.transform(utf8.decoder).join()
+  
+        httpClient.close();
+  disableRequest = false;
+  await _save();
+  Navigator.popUntil(context, ModalRoute.withName('/'));
+  return reply;
+}
+
+_save() async {
+        final prefs = await SharedPreferences.getInstance();
+        final key = 'experience';
+        int experience = prefs.getInt(key) ?? 0;
+        final key1 = 'level';
+        final level = prefs.getInt(key1) ?? 0;
+        experience++;
+        prefs.setInt(key, experience);
+        prefs.setInt(key1, level);
+      }
+
+      Future<String> fehlerMeldung(String fehler) async {
+
+return  showDialog<String>(
     context: context,
     barrierDismissible: false, // user must tap button!
     builder: (BuildContext context) {
@@ -192,7 +296,7 @@ Future<String> apiRequest() async {
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              Text('Es wurde keine Kategorie ausgewählt'),
+              Text(fehler),
             ],
           ),
         ),
@@ -207,19 +311,12 @@ Future<String> apiRequest() async {
       );
     },
   );
-            }
-            
-  HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
-  request.headers.set('content-type', 'application/json');
-  request.add(utf8.encode(json.encode(jsonMap)));
-  HttpClientResponse response = await request.close();
-  String reply = await response.transform(utf8.decoder).join();
-  httpClient.close();
-  Navigator.popUntil(context, ModalRoute.withName('/'));
-  return reply;
+
 }
 
 }
+
+
 
 class ButtonStruct{
   ButtonStruct({this.text,this.id,this.icon});
