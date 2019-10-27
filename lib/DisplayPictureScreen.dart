@@ -278,9 +278,9 @@ disableRequest = false;
   */
    
     Navigator.popUntil(context, ModalRoute.withName('/'));
-     fehlerMeldung('Meldung gesendet','Info',true);
   });
  }catch(e){
+   Navigator.of(context).pop();
 return fehlerMeldung('Server konnte nicht erreicht werden','Fehler',true);
  }
   await _save();
