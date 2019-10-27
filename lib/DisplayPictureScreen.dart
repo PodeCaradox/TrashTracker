@@ -199,7 +199,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
                                       ),
                                       actions: <Widget>[
                                         FlatButton(
-                                          child: Text('OK'),
+                                          child: Text('OK',style: new TextStyle(color: Colors.white),),
                                           onPressed: () {
                                             Navigator.of(context).pop();
                                           },
@@ -270,21 +270,14 @@ disableRequest = false;
       headers: {"Content-Type": "application/json"},
       body: json.encode(jsonMap)
   ).then((http.Response response) {
-    /*
-    print("Response status: ${response.statusCode}");
-    print("Response body: ${response.contentLength}");
-    print(response.headers);
-    print(response.request);
-  */
-   
-    Navigator.popUntil(context, ModalRoute.withName('/'));
+    
   });
  }catch(e){
    Navigator.of(context).pop();
 return fehlerMeldung('Server konnte nicht erreicht werden','Fehler',true);
  }
   await _save();
- 
+ Navigator.popUntil(context, ModalRoute.withName('/'));
   return null;
 }
 

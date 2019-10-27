@@ -18,7 +18,6 @@ Future<void> main() async {
   runApp(
     
     MaterialApp(
-      
       theme: new ThemeData(
   primarySwatch: MaterialColor(0xFFE6EAED,color),
   accentTextTheme: TextTheme(
